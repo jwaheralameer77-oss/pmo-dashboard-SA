@@ -414,23 +414,73 @@ def goals_logout():
 @app.route('/report')
 @login_required
 def report_page():
+    from models import Attendance
     employees = Employee.query.filter_by(is_active=True).all()
     emp_id = request.args.get('employee_id', type=int)
     report_type = request.args.get('type', 'full')
+    month = request.args.get('month', datetime.date.today().month, type=int)
+    year = request.args.get('year', datetime.date.today().year, type=int)
+    
     selected = None
     projects_list = []
     initiatives_list = []
     custom_tasks_list = []
+    attendance_records = []
+    top_performer = None
+    
+    # Get attendance data for the month
+    if report_type == 'attendance' or report_type == 'full':
+        attendance_records = Attendance.query.filter(
+            Attendance.date.like(f'{year}-{month:02d}%')
+        ).all()
+    
+    # Calculate top performer for the month
+    if report_type == 'certificate' or report_type == 'full':
+        emp_performance = []
+        for emp in employees:
+            # Calculate completion rate
+            total_projects = emp.projects.count()
+            completed = emp.projects.filter_by(status='مكتمل ومغلق').count()
+            completion_rate = (completed / total_projects * 100) if total_projects > 0 else 0
+            
+            # Calculate attendance rate
+            emp_attendance = [a for a in attendance_records if a.employee_id == emp.id]
+            present_days = len([a for a in emp_attendance if a.status == 'present'])
+            total_days = len(emp_attendance) if emp_attendance else 1
+            attendance_rate = (present_days / total_days * 100) if total_days > 0 else 0
+            
+            # Overall score (70% projects + 30% attendance)
+            overall_score = (completion_rate * 0.7) + (attendance_rate * 0.3)
+            
+            emp_performance.append({
+                'employee': emp,
+                'completion_rate': completion_rate,
+                'attendance_rate': attendance_rate,
+                'overall_score': overall_score,
+                'completed_projects': completed,
+                'total_projects': total_projects
+            })
+        
+        # Sort by overall score
+        emp_performance.sort(key=lambda x: x['overall_score'], reverse=True)
+        if emp_performance:
+            top_performer = emp_performance[0]
+    
     if emp_id:
         selected = Employee.query.get(emp_id)
         if selected:
             projects_list = list(selected.projects.all())
             initiatives_list = list(selected.initiatives.all())
             custom_tasks_list = list(selected.custom_tasks.all())
+    
+    months_ar = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"]
+    
     try:
         return render_template('report.html', employees=employees, selected=selected,
             projects_list=projects_list, initiatives_list=initiatives_list,
-            custom_tasks_list=custom_tasks_list, report_type=report_type)
+            custom_tasks_list=custom_tasks_list, report_type=report_type,
+            attendance_records=attendance_records, top_performer=top_performer,
+            month=month, year=year, month_name=months_ar[month-1])
     except Exception:
         import traceback
         tb = traceback.format_exc()
