@@ -1,12 +1,14 @@
 services:
   - type: web
     name: pmo-dashboard-sa
-    runtime: node
+    runtime: python
     plan: free
-    buildCommand: npm install && pip install -r requirements.txt
-    startCommand: node server.js
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
     envVars:
-      - key: NODE_ENV
-        value: production
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
