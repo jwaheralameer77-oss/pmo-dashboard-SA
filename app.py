@@ -443,10 +443,13 @@ def report_page():
 def performance_page():
     return render_template('performance.html', ratings=PERFORMANCE_RATING)
 
-def init_db():
+# Initialize database on startup
+try:
     with app.app_context():
         db.create_all()
         seed_database()
+except Exception as e:
+    print(f"Database initialization error: {e}")
 
 @app.errorhandler(500)
 def handle_500(e):
@@ -455,6 +458,5 @@ def handle_500(e):
     return f"<pre>500 Error:\n{traceback.format_exc()}</pre>", 500
 
 if __name__ == '__main__':
-    init_db()
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, port=port, host='0.0.0.0')

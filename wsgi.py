@@ -12,13 +12,7 @@ if current_dir not in sys.path:
 os.chdir(current_dir)
 
 # Import app
-from app import app as application, init_db
-
-# Initialize database on first load
-try:
-    init_db()
-except:
-    pass
+from app import app as application
 
 # For Gunicorn
 app = application
