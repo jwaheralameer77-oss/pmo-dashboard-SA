@@ -12,7 +12,16 @@ if current_dir not in sys.path:
 os.chdir(current_dir)
 
 # Import app
-from app import app as application
+from app import app as application, db
+from seed import seed_database
+
+# Initialize database
+try:
+    with application.app_context():
+        db.create_all()
+        seed_database()
+except Exception as e:
+    print(f"Database init error: {e}")
 
 # For Gunicorn
 app = application
