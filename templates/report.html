@@ -250,6 +250,61 @@
     </div>
     {% endif %}
 
+    <!-- Employee Performance Section (for full report) -->
+    {% if report_type == 'full' and selected %}
+    <div class="mb-8">
+      <h3 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: #0D7377;">
+        <span>📈</span> أداء الموظف - {{ month_name }} {{ year }}
+      </h3>
+      
+      {% set emp_att = attendance_records | selectattr('employee_id', 'equalto', selected.id) | list %}
+      {% set present = emp_att | selectattr('status', 'equalto', 'present') | list | length %}
+      {% set annual = emp_att | selectattr('status', 'equalto', 'annual') | list | length %}
+      {% set sick = emp_att | selectattr('status', 'equalto', 'sick') | list | length %}
+      {% set remote = emp_att | selectattr('status', 'equalto', 'remote') | list | length %}
+      {% set other = emp_att | selectattr('status', 'equalto', 'other') | list | length %}
+      {% set total_att = emp_att | length %}
+      {% set att_rate = (present / total_att * 100) if total_att > 0 else 0 %}
+      {% set completed_proj = selected.projects.filter_by(status='مكتمل ومغلق').count() %}
+      {% set total_proj = selected.projects.count() %}
+      {% set proj_rate = (completed_proj / total_proj * 100) if total_proj > 0 else 0 %}
+      {% set overall = (proj_rate * 0.7) + (att_rate * 0.3) %}
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="text-center p-4 rounded-lg" style="background-color: #E0F2F1; border: 2px solid #0D7377;">
+          <p class="text-sm font-semibold" style="color: #0A5C5F;">نسبة الحضور</p>
+          <p class="text-2xl font-bold" style="color: #0D7377;">{{ att_rate|round }}%</p>
+          <p class="text-xs text-gray-500">{{ present }} يوم من {{ total_att }}</p>
+        </div>
+        <div class="text-center p-4 rounded-lg" style="background-color: #E0F2F1; border: 2px solid #0D7377;">
+          <p class="text-sm font-semibold" style="color: #0A5C5F;">المشاريع المنجزة</p>
+          <p class="text-2xl font-bold" style="color: #0D7377;">{{ proj_rate|round }}%</p>
+          <p class="text-xs text-gray-500">{{ completed_proj }} من {{ total_proj }}</p>
+        </div>
+        <div class="text-center p-4 rounded-lg" style="background-color: #E8F5E9; border: 2px solid #43A047;">
+          <p class="text-sm font-semibold text-green-700">الإجازات السنوية</p>
+          <p class="text-2xl font-bold text-green-600">{{ annual }}</p>
+          <p class="text-xs text-gray-500">يوم</p>
+        </div>
+        <div class="text-center p-4 rounded-lg" style="background-color: #FFF3E0; border: 2px solid #FB8C00;">
+          <p class="text-sm font-semibold text-orange-700">الإجازات المرضية</p>
+          <p class="text-2xl font-bold text-orange-600">{{ sick }}</p>
+          <p class="text-xs text-gray-500">يوم</p>
+        </div>
+      </div>
+      
+      <!-- Overall Performance -->
+      <div class="p-6 rounded-xl text-center" style="background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%); border: 3px solid #0D7377;">
+        <p class="text-lg font-semibold mb-2" style="color: #0A5C5F;">التقييم الإجمالي</p>
+        <div class="text-4xl font-bold mb-2" style="color: #0D7377;">{{ overall|round }}%</div>
+        <div class="w-64 mx-auto bg-gray-200 rounded-full h-4">
+          <div class="h-4 rounded-full" style="width: {{ overall }}%; background: linear-gradient(90deg, #0D7377, #0A5C5F);"></div>
+        </div>
+        <p class="text-sm mt-2" style="color: #0A5C5F;">70% مشاريع + 30% حضور</p>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Attendance Report Section -->
     {% if report_type == 'attendance' %}
     <!-- Attendance Summary -->
@@ -307,64 +362,64 @@
     <!-- Excellence Certificate Section -->
     {% if report_type == 'certificate' and top_performer %}
     <div class="mb-8">
-      <!-- Certificate Design -->
-      <div class="border-8 border-yellow-400 rounded-xl p-8 bg-gradient-to-br from-yellow-50 to-orange-50 text-center">
+      <!-- Certificate Design - Teal Theme -->
+      <div class="border-8 rounded-xl p-8 text-center" style="border-color: #0D7377; background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%);">
         <!-- Header -->
         <div class="mb-6">
-          <img src="/static/img/logo.jpeg" alt="شعار المركز" class="h-20 object-contain mx-auto mb-4" onerror="this.style.display='none'" />
-          <h2 class="text-2xl font-bold text-gray-800">مركز التأمين الصحي الوطني</h2>
-          <p class="text-lg text-gray-600">إدارة المشاريع (PMO)</p>
+          <img src="/static/img/logo.jpeg" alt="شعار المركز" class="h-24 object-contain mx-auto mb-4 rounded-lg shadow-md" onerror="this.style.display='none'" />
+          <h2 class="text-2xl font-bold" style="color: #0A5C5F;">مركز التأمين الصحي الوطني</h2>
+          <p class="text-lg" style="color: #0D7377;">إدارة المشاريع (PMO)</p>
         </div>
 
         <!-- Title -->
         <div class="mb-8">
           <div class="text-6xl mb-4">🏆</div>
-          <h1 class="text-3xl font-bold text-yellow-600 mb-2">شهادة تميز</h1>
-          <p class="text-xl text-gray-600">شهر {{ month_name }} {{ year }}</p>
+          <h1 class="text-4xl font-bold mb-2" style="color: #0D7377;">شهادة تميز</h1>
+          <p class="text-xl" style="color: #0A5C5F;">شهر {{ month_name }} {{ year }}</p>
         </div>
 
         <!-- Recipient -->
-        <div class="mb-8 p-6 bg-white rounded-xl shadow-inner">
-          <p class="text-lg text-gray-600 mb-4">تُمنح هذه الشهادة لـ:</p>
+        <div class="mb-8 p-6 bg-white rounded-xl shadow-lg" style="border: 3px solid #0D7377;">
+          <p class="text-lg mb-4" style="color: #0A5C5F;">تُمنح هذه الشهادة تقديراً للأداء المتميز لـ:</p>
           <h2 class="text-4xl font-bold mb-4" style="color: #0D7377;">{{ top_performer.employee.name }}</h2>
-          <p class="text-gray-500">{{ top_performer.employee.portfolios | map(attribute='name') | join('، ') if top_performer.employee.portfolios else '' }}</p>
+          <p class="text-gray-600">{{ top_performer.employee.portfolios | map(attribute='name') | join('، ') if top_performer.employee.portfolios else '' }}</p>
         </div>
 
         <!-- Stats -->
         <div class="grid grid-cols-3 gap-4 mb-8">
-          <div class="bg-white rounded-lg p-4 shadow">
-            <p class="text-sm text-gray-500">المشاريع المنجزة</p>
-            <p class="text-2xl font-bold text-green-600">{{ top_performer.completed_projects }}/{{ top_performer.total_projects }}</p>
+          <div class="rounded-lg p-4 shadow" style="background-color: #E0F2F1; border: 2px solid #0D7377;">
+            <p class="text-sm font-semibold" style="color: #0A5C5F;">المشاريع المنجزة</p>
+            <p class="text-2xl font-bold" style="color: #0D7377;">{{ top_performer.completed_projects }}/{{ top_performer.total_projects }}</p>
           </div>
-          <div class="bg-white rounded-lg p-4 shadow">
-            <p class="text-sm text-gray-500">نسبة الإنجاز</p>
-            <p class="text-2xl font-bold text-blue-600">{{ top_performer.completion_rate|round }}%</p>
+          <div class="rounded-lg p-4 shadow" style="background-color: #E0F2F1; border: 2px solid #0D7377;">
+            <p class="text-sm font-semibold" style="color: #0A5C5F;">نسبة الإنجاز</p>
+            <p class="text-2xl font-bold" style="color: #0D7377;">{{ top_performer.completion_rate|round }}%</p>
           </div>
-          <div class="bg-white rounded-lg p-4 shadow">
-            <p class="text-sm text-gray-500">نسبة الحضور</p>
-            <p class="text-2xl font-bold text-orange-600">{{ top_performer.attendance_rate|round }}%</p>
+          <div class="rounded-lg p-4 shadow" style="background-color: #E0F2F1; border: 2px solid #0D7377;">
+            <p class="text-sm font-semibold" style="color: #0A5C5F;">نسبة الحضور</p>
+            <p class="text-2xl font-bold" style="color: #0D7377;">{{ top_performer.attendance_rate|round }}%</p>
           </div>
         </div>
 
         <!-- Overall Score -->
-        <div class="mb-8">
-          <p class="text-lg text-gray-600 mb-2">الدرجة الإجمالية</p>
+        <div class="mb-8 p-6 bg-white rounded-xl" style="border: 3px solid #0D7377;">
+          <p class="text-lg mb-2" style="color: #0A5C5F;">الدرجة الإجمالية</p>
           <div class="text-5xl font-bold" style="color: #0D7377;">{{ top_performer.overall_score|round }}%</div>
           <div class="mt-4 w-64 mx-auto bg-gray-200 rounded-full h-4">
-            <div class="h-4 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500" style="width: {{ top_performer.overall_score }}%"></div>
+            <div class="h-4 rounded-full" style="width: {{ top_performer.overall_score }}%; background: linear-gradient(90deg, #0D7377, #0A5C5F);"></div>
           </div>
         </div>
 
         <!-- Signature -->
-        <div class="mt-12 pt-8 border-t border-yellow-300">
+        <div class="mt-12 pt-8" style="border-top: 2px solid #0D7377;">
           <div class="flex justify-between items-center">
             <div class="text-right">
-              <p class="text-sm text-gray-500">تاريخ الإصدار</p>
-              <p class="font-bold" id="certDate"></p>
+              <p class="text-sm" style="color: #0A5C5F;">تاريخ الإصدار</p>
+              <p class="font-bold" style="color: #0D7377;" id="certDate"></p>
             </div>
             <div class="text-center">
-              <p class="text-sm text-gray-500 mb-8">التوقيع</p>
-              <p class="font-bold text-lg">مدير إدارة المشاريع</p>
+              <p class="text-sm mb-8" style="color: #0A5C5F;">التوقيع</p>
+              <p class="font-bold text-lg" style="color: #0D7377;">مدير إدارة المشاريع</p>
             </div>
           </div>
         </div>
