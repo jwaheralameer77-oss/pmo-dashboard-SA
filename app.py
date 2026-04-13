@@ -9,14 +9,19 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'pmo-dashboard-secret-key-2026')
 
-# Use PostgreSQL on Render, SQLite locally
+# Use /tmp for Render (writable directory), SQLite locally
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
     # Render PostgreSQL
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url.replace('postgres://', 'postgresql://')
 else:
-    # Local SQLite
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'pmo.db')
+    # Local SQLite or Render with /tmp
+    if os.environ.get('RENDER'):
+        # Render with SQLite in /tmp
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/pmo.db'
+    else:
+        # Local SQLite
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'pmo.db')
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 logging.basicConfig(level=logging.DEBUG)
