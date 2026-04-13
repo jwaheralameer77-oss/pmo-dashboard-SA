@@ -65,6 +65,7 @@ def logout():
 @app.route('/')
 @login_required
 def dashboard():
+    employees = Employee.query.filter_by(is_active=True).all()
     total_projects = Project.query.count()
     total_portfolios = Portfolio.query.count()
     total_initiatives = Initiative.query.count()
