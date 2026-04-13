@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}تقييم الأداء{% endblock %}
+
+{% block content %}
+<div class="p-6" dir="rtl">
+
+  <!-- Page Title -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">
+      تعريف تقييم الأداء
+      <span class="text-lg font-normal text-gray-500 mr-2">- Performance Rating Definition</span>
+    </h1>
+    <div class="mt-2 h-1 w-24 rounded" style="background-color: #0D7377;"></div>
+  </div>
+
+  <!-- Ratings Table -->
+  <div class="overflow-x-auto rounded-xl shadow-lg">
+    <table class="w-full border-collapse text-sm">
+
+      <!-- Header Row -->
+      <thead>
+        <tr style="background-color: #0D7377;">
+          <th class="px-5 py-4 text-right text-white font-bold border border-teal-700 whitespace-nowrap">
+            مقياس الإنجاز
+            <span class="block text-xs font-normal opacity-80">Achievement Scale</span>
+          </th>
+          <th class="px-5 py-4 text-center text-white font-bold border border-teal-700 whitespace-nowrap w-32">
+            الدرجة
+            <span class="block text-xs font-normal opacity-80">Rating Score</span>
+          </th>
+          <th class="px-5 py-4 text-center text-white font-bold border border-teal-700 whitespace-nowrap w-40">
+            التصنيف
+            <span class="block text-xs font-normal opacity-80">Rating</span>
+          </th>
+          <th class="px-5 py-4 text-right text-white font-bold border border-teal-700">
+            التعريف
+            <span class="block text-xs font-normal opacity-80">Rating Definitions</span>
+          </th>
+        </tr>
+      </thead>
+
+      <!-- Data Rows -->
+      <tbody>
+        {% if ratings %}
+          {% for item in ratings %}
+            <tr
+              style="{% if loop.index is odd %}background-color: #ffffff;{% else %}background-color: #E0F2F1;{% endif %}"
+              class="transition-colors hover:brightness-95"
+            >
+              <!-- Achievement Scale -->
+              <td class="px-5 py-4 border border-gray-200 text-gray-800 font-semibold whitespace-normal leading-relaxed">
+                {{ item.scale }}
+              </td>
+
+              <!-- Rating Score (large, bold, teal) -->
+              <td class="px-5 py-4 border border-gray-200 text-center">
+                <span class="text-2xl font-extrabold" style="color: #0D7377;">
+                  {{ item.score }}
+                </span>
+              </td>
+
+              <!-- Rating (English badge + Arabic if present) -->
+              <td class="px-5 py-4 border border-gray-200 text-center">
+                <span
+                  class="inline-block px-3 py-1 rounded-full text-xs font-bold text-white tracking-wide"
+                  style="background-color: #0A5C5F;"
+                >
+                  {{ item.en }}
+                </span>
+              </td>
+
+              <!-- Arabic Definition -->
+              <td class="px-5 py-4 border border-gray-200 text-gray-800 whitespace-normal leading-relaxed">
+                {{ item.ar }}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td
+              colspan="4"
+              class="px-6 py-10 text-center text-gray-400 italic border border-gray-200"
+            >
+              لا توجد بيانات تقييم متاحة
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

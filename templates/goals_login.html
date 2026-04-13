@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}الأهداف السنوية{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100" dir="rtl">
+  <div class="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md">
+
+    <!-- Lock Icon -->
+    <div class="flex justify-center mb-4">
+      <span class="text-6xl select-none">🔒</span>
+    </div>
+
+    <!-- Title -->
+    <h1 class="text-center text-2xl font-bold mb-2" style="color: #0D7377;">
+      الأهداف السنوية - منطقة محمية
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="text-center text-gray-500 text-sm mb-8">
+      هذا القسم متاح للمدير فقط
+    </p>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium
+            {% if category == 'error' %}
+              bg-red-100 text-red-700 border border-red-300
+            {% else %}
+              bg-green-100 text-green-700 border border-green-300
+            {% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Login Form -->
+    <form method="POST" action="/goals/login" class="space-y-5">
+      <div>
+        <label for="password" class="block text-sm font-semibold text-gray-700 mb-1 text-right">
+          كلمة المرور
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+          placeholder="أدخل كلمة المرور"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 text-right focus:outline-none focus:ring-2 focus:border-transparent transition"
+          style="focus-ring-color: #0D7377;"
+          onfocus="this.style.borderColor='#0D7377'; this.style.boxShadow='0 0 0 2px rgba(13,115,119,0.25)';"
+          onblur="this.style.borderColor=''; this.style.boxShadow='';"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full py-2 px-4 rounded-lg text-white font-bold text-lg transition-opacity hover:opacity-90 active:opacity-75"
+        style="background-color: #0D7377;"
+      >
+        دخول
+      </button>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

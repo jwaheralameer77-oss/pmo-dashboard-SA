@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block title %}المبادرات والإنجازات{% endblock %}
+
+{% block content %}
+<div class="p-6" dir="rtl" x-data="{ showInitForm: false, showTaskForm: false }">
+
+  <!-- Header -->
+  <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800 border-b-4 pb-3 inline-block" style="border-color: #7B1FA2;">المبادرات والإنجازات</h1>
+    </div>
+    <div class="flex gap-3">
+      <button @click="showInitForm = !showInitForm" class="px-4 py-2 rounded-lg text-white font-semibold transition" style="background-color: #7B1FA2;">
+        <span x-text="showInitForm ? 'إخفاء' : '+ إضافة مبادرة'"></span>
+      </button>
+      <button @click="showTaskForm = !showTaskForm" class="px-4 py-2 rounded-lg text-white font-semibold transition" style="background-color: #1565C0;">
+        <span x-text="showTaskForm ? 'إخفاء' : '+ إضافة مهمة'"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+    <form method="GET" action="/initiatives" class="flex flex-wrap items-end gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1">الموظف</label>
+        <select name="employee_id" class="border border-gray-300 rounded-lg px-3 py-2 bg-white" onchange="this.form.submit()">
+          <option value="">جميع الموظفين</option>
+          {% for emp in employees %}
+          <option value="{{ emp.id }}" {% if emp_filter == emp.id %}selected{% endif %}>{{ emp.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <!-- Add Initiative Form -->
+  <div x-show="showInitForm" x-transition class="bg-purple-50 rounded-xl shadow-md p-6 mb-6 border border-purple-200">
+    <h3 class="text-lg font-bold text-purple-800 mb-4">إضافة مبادرة جديدة</h3>
+    <form method="POST" action="/initiatives/add" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-1">اسم المبادرة</label>
+        <input type="text" name="name" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الموظف</label>
+        <select name="employee_id" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          {% for emp in employees %}
+          <option value="{{ emp.id }}">{{ emp.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
+        <textarea name="description" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ البداية</label>
+        <input type="date" name="start_date" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ النهاية</label>
+        <input type="date" name="end_date" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
+        <select name="status" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          <option value="جاري العمل">جاري العمل</option>
+          <option value="مكتملة">مكتملة</option>
+          <option value="منجزة">منجزة</option>
+        </select>
+      </div>
+      <div class="md:col-span-3">
+        <button type="submit" class="px-6 py-2 rounded-lg text-white font-semibold" style="background-color: #7B1FA2;">حفظ المبادرة</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Add Custom Task Form -->
+  <div x-show="showTaskForm" x-transition class="bg-blue-50 rounded-xl shadow-md p-6 mb-6 border border-blue-200">
+    <h3 class="text-lg font-bold text-blue-800 mb-4">إضافة مهمة جديدة</h3>
+    <form method="POST" action="/custom_tasks/add" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-1">عنوان المهمة</label>
+        <input type="text" name="title" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الموظف</label>
+        <select name="employee_id" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          {% for emp in employees %}
+          <option value="{{ emp.id }}">{{ emp.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
+        <textarea name="description" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ البداية</label>
+        <input type="date" name="start_date" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ النهاية</label>
+        <input type="date" name="end_date" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
+        <select name="status" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          <option value="جاري العمل">جاري العمل</option>
+          <option value="مكتملة">مكتملة</option>
+        </select>
+      </div>
+      <div class="md:col-span-3">
+        <button type="submit" class="px-6 py-2 rounded-lg text-white font-semibold" style="background-color: #1565C0;">حفظ المهمة</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Initiatives Table -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b" style="background-color: #7B1FA2;">
+      <h3 class="text-lg font-bold text-white">المبادرات والإنجازات</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-purple-50">
+            <th class="px-4 py-3 text-right font-semibold text-gray-700">#</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-700">اسم المبادرة</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-700">الموظف</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-700">تاريخ البداية</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-700">تاريخ النهاية</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-700">الحالة</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-700">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for init in initiatives %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-4 py-3 text-gray-500">{{ loop.index }}</td>
+            <td class="px-4 py-3">
+              <div class="font-medium text-gray-800">{{ init.name }}</div>
+              {% if init.description %}
+              <div class="text-xs text-gray-500 mt-1">{{ init.description[:50] }}{% if init.description|length > 50 %}...{% endif %}</div>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 text-gray-700">{{ init.employee.name }}</td>
+            <td class="px-4 py-3 text-center text-gray-600">{{ init.start_date }}</td>
+            <td class="px-4 py-3 text-center text-gray-600">{{ init.end_date }}</td>
+            <td class="px-4 py-3 text-center">
+              <select onchange="updateInitStatus({{ init.id }}, this.value)" 
+                class="text-xs px-2 py-1 rounded border {% if init.status in ['مكتملة', 'منجزة'] %}bg-green-100 text-green-700 border-green-300{% else %}bg-orange-100 text-orange-700 border-orange-300{% endif %}">
+                <option value="جاري العمل" {% if init.status == 'جاري العمل' %}selected{% endif %}>جاري العمل</option>
+                <option value="مكتملة" {% if init.status == 'مكتملة' %}selected{% endif %}>مكتملة</option>
+                <option value="منجزة" {% if init.status == 'منجزة' %}selected{% endif %}>منجزة</option>
+              </select>
+            </td>
+            <td class="px-4 py-3 text-center">
+              <form method="POST" action="/initiatives/{{ init.id }}/delete" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه المبادرة؟')">
+                <button type="submit" class="text-red-600 hover:text-red-800 text-xs">حذف</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="px-4 py-8 text-center text-gray-400">لا توجد مبادرات مسجلة</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Custom Tasks Table -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="px-6 py-4 border-b" style="background-color: #1565C0;">
+      <h3 class="text-lg font-bold text-white">المهام الإضافية</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-blue-50">
+            <th class="px-4 py-3 text-right font-semibold text-gray-700">#</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-700">عنوان المهمة</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-700">الموظف</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-700">تاريخ البداية</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-700">تاريخ النهاية</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-700">الحالة</th>
+            <th class="px-4 py-3 text-center font-semibold text-gray-700">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for task in custom_tasks %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-4 py-3 text-gray-500">{{ loop.index }}</td>
+            <td class="px-4 py-3">
+              <div class="font-medium text-gray-800">{{ task.title }}</div>
+              {% if task.description %}
+              <div class="text-xs text-gray-500 mt-1">{{ task.description[:50] }}{% if task.description|length > 50 %}...{% endif %}</div>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 text-gray-700">{{ task.employee.name }}</td>
+            <td class="px-4 py-3 text-center text-gray-600">{{ task.start_date }}</td>
+            <td class="px-4 py-3 text-center text-gray-600">{{ task.end_date }}</td>
+            <td class="px-4 py-3 text-center">
+              <select onchange="updateTaskStatus({{ task.id }}, this.value)" 
+                class="text-xs px-2 py-1 rounded border {% if task.status == 'مكتملة' %}bg-green-100 text-green-700 border-green-300{% else %}bg-orange-100 text-orange-700 border-orange-300{% endif %}">
+                <option value="جاري العمل" {% if task.status == 'جاري العمل' %}selected{% endif %}>جاري العمل</option>
+                <option value="مكتملة" {% if task.status == 'مكتملة' %}selected{% endif %}>مكتملة</option>
+              </select>
+            </td>
+            <td class="px-4 py-3 text-center">
+              <form method="POST" action="/custom_tasks/{{ task.id }}/delete" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه المهمة؟')">
+                <button type="submit" class="text-red-600 hover:text-red-800 text-xs">حذف</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="px-4 py-8 text-center text-gray-400">لا توجد مهام مسجلة</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function updateInitStatus(id, status) {
+  fetch('/initiatives/' + id + '/status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'status=' + encodeURIComponent(status)
+  }).then(() => location.reload());
+}
+
+function updateTaskStatus(id, status) {
+  fetch('/custom_tasks/' + id + '/status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'status=' + encodeURIComponent(status)
+  }).then(() => location.reload());
+}
+</script>
+{% endblock %}

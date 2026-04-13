@@ -1,0 +1,12 @@
+{
+  "name": "pmo-dashboard",
+  "version": "1.0.0",
+  "description": "PMO Dashboard for National Health Insurance Center",
+  "main": "app.py",
+  "scripts": {
+    "start": "python app.py"
+  },
+  "engines": {
+    "python": "3.10"
+  }
+}

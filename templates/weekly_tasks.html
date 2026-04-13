@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}المهام الأسبوعية{% endblock %}
+
+{% block content %}
+<div
+  dir="rtl"
+  class="min-h-screen bg-gray-50 p-6"
+  x-data="{
+    emp_id: '', project_id: '', week_date: '', projects: [], tasks: [], projectStatus: '', loaded: false,
+    async loadProjects() {
+        if (!this.emp_id) return;
+        let r = await fetch('/api/projects_by_employee/' + this.emp_id);
+        this.projects = await r.json();
+        this.project_id = '';
+        this.tasks = [];
+        this.loaded = false;
+        this.projectStatus = '';
+    },
+    async loadTasks() {
+        if (!this.project_id || !this.week_date) return;
+        let r = await fetch('/api/tasks/' + this.project_id + '/' + this.week_date);
+        this.tasks = await r.json();
+        console.log('Loaded tasks:', this.tasks);
+        this.loaded = true;
+        this.projectStatus = '';
+    },
+    async saveTasks() {
+        let r = await fetch('/api/tasks/' + this.project_id + '/' + this.week_date, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tasks: this.tasks })
+        });
+        let d = await r.json();
+        this.projectStatus = d.project_status;
+    },
+    statusClass(status) {
+        if (status === 'نعم') return 'bg-green-100 text-green-800';
+        if (status === 'لا') return 'bg-red-100 text-red-800';
+        if (status === 'جاري العمل عليه') return 'bg-orange-100 text-orange-800';
+        if (status === 'لا ينطبق') return 'bg-gray-100 text-gray-600';
+        return '';
+    }
+  }"
+>
+
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 border-b-4 border-blue-600 pb-3 inline-block">
+      المهام الأسبوعية
+    </h1>
+  </div>
+
+  <!-- Selection Card -->
+  <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-700 mb-5">اختيار الموظف والمشروع</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+      <!-- Employee Dropdown -->
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1">الموظف</label>
+        <select
+          x-model="emp_id"
+          @change="loadProjects()"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+        >
+          <option value="">-- اختر الموظف --</option>
+          {% for emp in employees %}
+          <option value="{{ emp.id }}">{{ emp.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Project Dropdown (AJAX-populated) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1">المشروع</label>
+        <select
+          x-model="project_id"
+          :disabled="projects.length === 0"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white disabled:opacity-50"
+        >
+          <option value="">-- اختر المشروع --</option>
+          <template x-for="proj in projects" :key="proj.id">
+            <option :value="proj.id" x-text="proj.name"></option>
+          </template>
+        </select>
+      </div>
+
+      <!-- Week Date Input -->
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1">تاريخ الأسبوع</label>
+        <input
+          type="date"
+          x-model="week_date"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+
+    </div>
+
+    <!-- Load Button -->
+    <div class="mt-5 flex justify-start">
+      <button
+        @click="loadTasks()"
+        :disabled="!project_id || !week_date"
+        class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-2 rounded-lg shadow transition duration-150"
+      >
+        تحميل المهام
+      </button>
+    </div>
+  </div>
+
+  <!-- Tasks Table (shown after loading) -->
+  <div x-show="loaded" x-transition class="bg-white rounded-2xl shadow-md p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-700 mb-5">جدول المهام</h2>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-right border-collapse">
+        <thead>
+          <tr class="bg-blue-600 text-white">
+            <th class="px-4 py-3 font-semibold rounded-tr-lg">#</th>
+            <th class="px-4 py-3 font-semibold">المهمة</th>
+            <th class="px-4 py-3 font-semibold">الحالة</th>
+            <th class="px-4 py-3 font-semibold">الملاحظات</th>
+            <th class="px-4 py-3 font-semibold rounded-tl-lg">الهدف المرتبط</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="(task, index) in tasks" :key="task.task_def_id">
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+              <!-- Row Number -->
+              <td class="px-4 py-3 text-gray-500 font-medium" x-text="index + 1"></td>
+
+              <!-- Task Question -->
+              <td class="px-4 py-3 text-gray-700 font-medium max-w-xs" x-text="task.question"></td>
+
+              <!-- Status Dropdown with color binding -->
+              <td class="px-4 py-2">
+                <select
+                  x-model="task.status"
+                  :class="'w-full rounded-lg px-2 py-1 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 ' + statusClass(task.status)"
+                >
+                  <option value=""></option>
+                  <option value="نعم">نعم</option>
+                  <option value="لا">لا</option>
+                  <option value="لا ينطبق">لا ينطبق</option>
+                  <option value="جاري العمل عليه">جاري العمل عليه</option>
+                </select>
+              </td>
+
+              <!-- Notes Input -->
+              <td class="px-4 py-2">
+                <input
+                  type="text"
+                  x-model="task.notes"
+                  placeholder="أدخل ملاحظة..."
+                  class="w-full border border-gray-200 rounded-lg px-3 py-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                />
+              </td>
+
+              <!-- Goal Link -->
+              <td class="px-4 py-3">
+                <span
+                  x-show="task.goal_link"
+                  class="inline-block bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full border border-blue-200"
+                  x-text="'الهدف ' + task.goal_link"
+                ></span>
+                <span x-show="!task.goal_link" class="text-gray-300 text-xs">—</span>
+              </td>
+            </tr>
+          </template>
+
+          <!-- Empty state -->
+          <tr x-show="tasks.length === 0">
+            <td colspan="5" class="px-4 py-8 text-center text-gray-400">لا توجد مهام للأسبوع المحدد</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Save Button -->
+    <div class="mt-6 flex items-center gap-4">
+      <button
+        @click="saveTasks()"
+        :disabled="tasks.length === 0"
+        class="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-8 py-2 rounded-lg shadow transition duration-150"
+      >
+        حفظ المهام
+      </button>
+
+      <!-- Project Status Badge -->
+      <div x-show="projectStatus" x-transition class="flex items-center gap-2">
+        <span class="text-sm text-gray-600 font-medium">حالة المشروع:</span>
+        <span
+          class="inline-block px-4 py-1 rounded-full text-sm font-bold"
+          :class="{
+            'bg-green-100 text-green-800 border border-green-300': projectStatus === 'مكتمل',
+            'bg-orange-100 text-orange-800 border border-orange-300': projectStatus === 'جاري',
+            'bg-red-100 text-red-800 border border-red-300': projectStatus === 'متأخر',
+            'bg-gray-100 text-gray-700 border border-gray-300': !['مكتمل','جاري','متأخر'].includes(projectStatus)
+          }"
+          x-text="projectStatus"
+        ></span>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

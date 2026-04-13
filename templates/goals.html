@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}الأهداف السنوية{% endblock %}
+
+{% block content %}
+<div class="p-6" dir="rtl" x-data>
+
+  <!-- Page Header -->
+  <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <h1 class="text-2xl font-bold" style="color: #0D7377;">
+        الأهداف السنوية للموظفين
+      </h1>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold text-white bg-red-700 tracking-wide">
+        سري - للمدير فقط
+      </span>
+    </div>
+
+    <!-- Logout -->
+    <a
+      href="/goals/logout"
+      class="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-85"
+      style="background-color: #0A5C5F;"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+      </svg>
+      تسجيل الخروج
+    </a>
+  </div>
+
+  <!-- Employee Sections -->
+  {% if employees %}
+    {% for employee in employees %}
+      <div
+        class="mb-4 rounded-xl overflow-hidden shadow"
+        x-data="{ open: false }"
+      >
+        <!-- Employee Name Header (Toggle) -->
+        <button
+          @click="open = !open"
+          class="w-full flex items-center justify-between px-5 py-4 text-white font-bold text-lg focus:outline-none transition-opacity hover:opacity-90"
+          style="background-color: #0D7377;"
+        >
+          <span>{{ employee.name }}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 transition-transform duration-300"
+            :class="open ? 'rotate-180' : ''"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <!-- Goals Table -->
+        <div x-show="open" x-transition class="overflow-x-auto">
+          <table class="w-full text-sm border-collapse">
+            <thead>
+              <tr style="background-color: #E0F2F1;">
+                <th class="border border-gray-300 px-4 py-2 text-right font-semibold" style="color: #0A5C5F; width: 5%;">#</th>
+                <th class="border border-gray-300 px-4 py-2 text-right font-semibold" style="color: #0A5C5F;">الهدف السنوي</th>
+                <th class="border border-gray-300 px-4 py-2 text-center font-semibold" style="color: #0A5C5F; width: 10%;">الوزن</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if employee.annual_goals %}
+                {% for goal in employee.annual_goals %}
+                  <tr class="{% if loop.index is odd %}bg-white{% else %}bg-gray-50{% endif %} hover:bg-teal-50 transition-colors">
+                    <td class="border border-gray-200 px-4 py-3 text-right font-medium text-gray-600">
+                      {{ goal.goal_number }}
+                    </td>
+                    <td class="border border-gray-200 px-4 py-3 text-right text-gray-800 whitespace-normal leading-relaxed">
+                      {{ goal.text }}
+                    </td>
+                    <td class="border border-gray-200 px-4 py-3 text-center font-bold" style="color: #0D7377;">
+                      {{ goal.weight }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="3" class="border border-gray-200 px-4 py-6 text-center text-gray-400 italic">
+                    لا توجد أهداف مسجّلة لهذا الموظف
+                  </td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="text-center py-16 text-gray-400 text-lg">
+      لا يوجد موظفون مسجّلون
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
