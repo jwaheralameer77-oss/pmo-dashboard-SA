@@ -2,11 +2,16 @@
   "name": "pmo-dashboard",
   "version": "1.0.0",
   "description": "PMO Dashboard for National Health Insurance Center",
-  "main": "app.py",
+  "main": "server.js",
   "scripts": {
-    "start": "python app.py"
+    "start": "node server.js",
+    "build": "pip install -r requirements.txt"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy": "^1.18.1"
   },
   "engines": {
-    "python": "3.10"
+    "node": ">=18.0.0"
   }
 }
