@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>دليل نشر PMO Dashboard على Render</title>
+    <style>
+        * { font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: #f5f5f5; padding: 20px; line-height: 1.8; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #0D7377; text-align: center; border-bottom: 3px solid #0D7377; padding-bottom: 15px; }
+        h2 { color: #0A5C5F; margin-top: 30px; border-right: 4px solid #0D7377; padding-right: 15px; }
+        .step { background: #E0F2F1; padding: 20px; margin: 20px 0; border-radius: 8px; border-right: 4px solid #0D7377; }
+        .step-number { background: #0D7377; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-left: 10px; }
+        .screenshot { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; color: #666; font-style: italic; }
+        .important { background: #FFF3E0; border: 2px solid #FB8C00; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .important-title { color: #E65100; font-weight: bold; margin-bottom: 10px; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        .link { color: #1565C0; text-decoration: none; }
+        .link:hover { text-decoration: underline; }
+        ul { padding-right: 20px; }
+        li { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📘 دليل نشر PMO Dashboard على Render</h1>
+        
+        <div class="important">
+            <div class="important-title">⚠️ متطلبات أساسية:</div>
+            <ul>
+                <li>حساب على <a href="https://github.com" class="link">GitHub</a></li>
+                <li>حساب على <a href="https://render.com" class="link">Render</a> (مجاني)</li>
+                <li>المشروع مرفوع على GitHub</li>
+            </ul>
+        </div>
+
+        <h2>الخطوة 1: تسجيل الدخول إلى Render</h2>
+        <div class="step">
+            <span class="step-number">1</span>
+            افتح المتصفح وادخل إلى:
+            <br><br>
+            <a href="https://dashboard.render.com" class="link">https://dashboard.render.com</a>
+            <br><br>
+            اضغط على <strong>"Sign up with GitHub"</strong>
+        </div>
+        
+        <div class="screenshot">
+            [صورة: زر تسجيل الدخول بـ GitHub]
+        </div>
+
+        <h2>الخطوة 2: إنشاء Web Service جديد</h2>
+        <div class="step">
+            <span class="step-number">2</span>
+            بعد تسجيل الدخول، اضغط على الزر الأزرق:
+            <br><br>
+            <strong>"New +"</strong> → <strong>"Web Service"</strong>
+        </div>
+        
+        <div class="screenshot">
+            [صورة: قائمة New + المنسدلة]
+        </div>
+
+        <h2>الخطوة 3: اختيار المستودع</h2>
+        <div class="step">
+            <span class="step-number">3</span>
+            اختر <strong>"Build and deploy from a Git repository"</strong>
+            <br>
+            ثم اضغط <strong>"Next"</strong>
+        </div>
+        
+        <div class="screenshot">
+            [صورة: خيار Build and deploy from a Git repository]
+        </div>
+
+        <h2>الخطوة 4: البحث عن المستودع</h2>
+        <div class="step">
+            <span class="step-number">4</span>
+            في حقل البحث، اكتب:
+            <br><br>
+            <code>pmo-dashboard-SA</code>
+            <br><br>
+            ثم اضغط على <strong>"Connect"</strong> بجانب المستودع
+        </div>
+        
+        <div class="screenshot">
+            [صورة: قائمة المستودعات مع زر Connect]
+        </div>
+
+        <h2>الخطوة 5: إعدادات الخدمة</h2>
+        <div class="step">
+            <span class="step-number">5</span>
+            املأ البيانات كالتالي:
+            <br><br>
+            <table border="1" cellpadding="10" style="width:100%; border-collapse: collapse;">
+                <tr style="background: #0D7377; color: white;">
+                    <th>الحقل</th>
+                    <th>القيمة</th>
+                </tr>
+                <tr>
+                    <td><strong>Name</strong></td>
+                    <td><code>pmo-dashboard-sa</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Region</strong></td>
+                    <td>Frankfurt (EU Central)</td>
+                </tr>
+                <tr>
+                    <td><strong>Branch</strong></td>
+                    <td><code>main</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Runtime</strong></td>
+                    <td>Node</td>
+                </tr>
+                <tr>
+                    <td><strong>Build Command</strong></td>
+                    <td><code>npm install && pip install -r requirements.txt</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Start Command</strong></td>
+                    <td><code>node server.js</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Plan</strong></td>
+                    <td>Free</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="screenshot">
+            [صورة: نموذج الإعدادات مملوء]
+        </div>
+
+        <h2>الخطوة 6: إنشاء الخدمة</h2>
+        <div class="step">
+            <span class="step-number">6</span>
+            اضغط على الزر الأخضر:
+            <br><br>
+            <strong>"Create Web Service"</strong>
+        </div>
+        
+        <div class="screenshot">
+            [صورة: زر Create Web Service]
+        </div>
+
+        <h2>الخطوة 7: انتظار التشغيل</h2>
+        <div class="step">
+            <span class="step-number">7</span>
+            انتظر 3-5 دقائق حتى يكتمل النشر.
+            <br>
+            ستشاهد سجلات البناء في الوقت الفعلي.
+        </div>
+        
+        <div class="screenshot">
+            [صورة: شاشة Logs showing build progress]
+        </div>
+
+        <div class="important">
+            <div class="important-title">✅ عند اكتمال النشر:</div>
+            <ul>
+                <li>سيظهر زر أخضر بجانب اسم الخدمة</li>
+                <li>الرابط سيكون: <code>https://pmo-dashboard-sa.onrender.com</code></li>
+                <li>اضغط على الرابط لفتح التطبيق</li>
+            </ul>
+        </div>
+
+        <h2>🔧 في حالة وجود مشاكل:</h2>
+        <div class="step">
+            <span class="step-number">!</span>
+            <strong>إعادة النشر:</strong>
+            <ol>
+                <li>ادخل إلى خدمتك في Render</li>
+                <li>اضغط على <strong>"Manual Deploy"</strong></li>
+                <li>اختر <strong>"Deploy latest commit"</strong></li>
+            </ol>
+        </div>
+        
+        <div class="screenshot">
+            [صورة: زر Manual Deploy]
+        </div>
+
+        <h2>📱 بيانات الدخول:</h2>
+        <div class="step">
+            <table border="1" cellpadding="10" style="width:100%; border-collapse: collapse;">
+                <tr style="background: #E0F2F1;">
+                    <td><strong>اسم المستخدم</strong></td>
+                    <td><code>admin</code></td>
+                </tr>
+                <tr style="background: #E0F2F1;">
+                    <td><strong>كلمة المرور</strong></td>
+                    <td><code>pmo2024</code></td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #0D7377; color: white; border-radius: 10px;">
+            <h3>🎉 تهانينا! تطبيقك متاح الآن على الإنترنت</h3>
+            <p style="font-size: 18px; margin-top: 10px;">
+                الرابط: <code>https://pmo-dashboard-sa.onrender.com</code>
+            </p>
+        </div>
+
+        <div class="important" style="margin-top: 30px;">
+            <div class="important-title">⚠️ ملاحظات مهمة:</div>
+            <ul>
+                <li>الخطة المجانية تدخل في وضع السكون بعد 15 دقيقة من عدم الاستخدام</li>
+                <li>عند أول زيارة بعد السكون، يستغرق 30-60 ثانية للاستيقاظ</li>
+                <li>البيانات تُحفظ في قاعدة SQLite مؤقتاً (قد تُحذف عند إعادة التشغيل)</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; color: #666;">
+            <p>© 2026 مركز التأمين الصحي الوطني - إدارة المشاريع</p>
+        </div>
+    </div>
+</body>
+</html>

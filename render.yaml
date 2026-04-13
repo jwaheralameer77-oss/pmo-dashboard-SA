@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
+    startCommand: python start.py
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -12,3 +12,5 @@ services:
         value: production
       - key: SECRET_KEY
         generateValue: true
+      - key: RENDER
+        value: "true"
