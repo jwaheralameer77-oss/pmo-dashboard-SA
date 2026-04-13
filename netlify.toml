@@ -1,0 +1,11 @@
+[build]
+  publish = "dist"
+  command = "python build_static.py"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

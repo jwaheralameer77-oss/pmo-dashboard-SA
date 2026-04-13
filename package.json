@@ -1,17 +1,12 @@
 {
-  "name": "pmo-dashboard",
+  "name": "pmo-dashboard-surge",
   "version": "1.0.0",
   "description": "PMO Dashboard for National Health Insurance Center",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "pip install -r requirements.txt"
+    "build": "python build_static.py",
+    "deploy": "npm run build && surge dist pmo-dashboard-sa.surge.sh"
   },
-  "dependencies": {
-    "express": "^4.18.2",
-    "http-proxy": "^1.18.1"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+  "devDependencies": {
+    "surge": "^0.23.1"
   }
 }
