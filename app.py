@@ -183,6 +183,23 @@ def update_project_status(proj_id):
     db.session.commit()
     return jsonify({'ok': True})
 
+@app.route('/projects/add', methods=['POST'])
+@login_required
+def add_project():
+    name = request.form.get('name', '').strip()
+    employee_id = request.form.get('employee_id', type=int)
+    portfolio_id = request.form.get('portfolio_id', type=int)
+    
+    if not name:
+        flash('يرجى إدخال اسم المشروع', 'error')
+        return redirect(url_for('projects_page'))
+    
+    proj = Project(name=name, employee_id=employee_id, portfolio_id=portfolio_id, status='جاري العمل عليه')
+    db.session.add(proj)
+    db.session.commit()
+    flash(f'تم إضافة المشروع {name} بنجاح', 'success')
+    return redirect(url_for('projects_page'))
+
 # ---- WEEKLY TASKS ----
 @app.route('/tasks')
 @login_required
