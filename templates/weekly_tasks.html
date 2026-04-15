@@ -7,7 +7,7 @@
   dir="rtl"
   class="min-h-screen bg-gray-50 p-6"
   x-data="{
-    emp_id: '', project_id: '', week_date: '', projects: [], tasks: [], projectStatus: '', loaded: false,
+    emp_id: '', project_id: '', week_date: '', projects: [], tasks: [], finalProjectStatus: '', loaded: false,
     async loadProjects() {
         if (!this.emp_id) return;
         let r = await fetch('/api/projects_by_employee/' + this.emp_id);
@@ -15,7 +15,7 @@
         this.project_id = '';
         this.tasks = [];
         this.loaded = false;
-        this.projectStatus = '';
+        this.finalProjectStatus = '';
     },
     async loadTasks() {
         if (!this.project_id || !this.week_date) return;
@@ -23,21 +23,25 @@
         this.tasks = await r.json();
         console.log('Loaded tasks:', this.tasks);
         this.loaded = true;
-        this.projectStatus = '';
+        this.finalProjectStatus = '';
     },
     async saveTasks() {
+        let payload = { 
+            tasks: this.tasks,
+            project_status: this.finalProjectStatus
+        };
         let r = await fetch('/api/tasks/' + this.project_id + '/' + this.week_date, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tasks: this.tasks })
+            body: JSON.stringify(payload)
         });
         let d = await r.json();
-        this.projectStatus = d.project_status;
+        alert('تم حفظ المهام وحالة المشروع بنجاح!');
     },
     statusClass(status) {
         if (status === 'نعم') return 'bg-green-100 text-green-800';
         if (status === 'لا') return 'bg-red-100 text-red-800';
-        if (status === 'جاري العمل عليه') return 'bg-orange-100 text-orange-800';
+        if (status === 'جاري العمل') return 'bg-orange-100 text-orange-800';
         if (status === 'لا ينطبق') return 'bg-gray-100 text-gray-600';
         return '';
     }
@@ -178,15 +182,58 @@
       </table>
     </div>
 
-    <!-- Save Button Only -->
-    <div class="mt-6">
+    <!-- Final Project Status Question -->
+    <div class="mt-8 p-6 bg-gradient-to-r from-teal-50 to-blue-50 rounded-xl border-2 border-teal-200">
+      <h3 class="text-lg font-bold text-teal-800 mb-4">📝 تحديد حالة المشروع النهائية</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">ما هي حالة المشروع؟</label>
+          <select 
+            x-model="finalProjectStatus"
+            class="w-full border-2 border-teal-300 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+          >
+            <option value="">-- اختر حالة المشروع --</option>
+            <option value="مكتمل">✅ مكتمل</option>
+            <option value="غير مكتمل">❌ غير مكتمل</option>
+            <option value="جاري العمل والمتابعة">🔄 جاري العمل والمتابعة</option>
+            <option value="مغلق">🔒 مغلق</option>
+            <option value="منتهي">🏁 منتهي</option>
+          </select>
+        </div>
+        
+        <div class="flex items-end">
+          <div class="bg-white p-4 rounded-lg border border-gray-200 w-full">
+            <p class="text-sm text-gray-600 mb-2">الحالة المختارة:</p>
+            <span 
+              x-show="finalProjectStatus"
+              x-text="finalProjectStatus"
+              class="inline-block px-4 py-2 rounded-lg text-lg font-bold"
+              :class="{
+                'bg-green-100 text-green-800': finalProjectStatus === 'مكتمل',
+                'bg-red-100 text-red-800': finalProjectStatus === 'غير مكتمل',
+                'bg-blue-100 text-blue-800': finalProjectStatus === 'جاري العمل والمتابعة',
+                'bg-gray-100 text-gray-800': finalProjectStatus === 'مغلق',
+                'bg-purple-100 text-purple-800': finalProjectStatus === 'منتهي'
+              }"
+            ></span>
+            <span x-show="!finalProjectStatus" class="text-gray-400">لم يتم التحديد بعد</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save Button -->
+    <div class="mt-6 flex items-center gap-4">
       <button
         @click="saveTasks()"
-        :disabled="tasks.length === 0"
-        class="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-8 py-2 rounded-lg shadow transition duration-150"
+        :disabled="tasks.length === 0 || !finalProjectStatus"
+        class="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-8 py-3 rounded-lg shadow transition duration-150"
       >
-        حفظ المهام
+        💾 حفظ المهام وحالة المشروع
       </button>
+      
+      <span x-show="!finalProjectStatus" class="text-red-500 text-sm">* يجب تحديد حالة المشروع قبل الحفظ</span>
     </div>
   </div>
 

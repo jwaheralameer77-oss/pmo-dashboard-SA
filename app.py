@@ -254,17 +254,15 @@ def save_tasks(project_id, week_date):
         tr.notes = item.get('notes', '')
     db.session.commit()
 
-    responses = TaskResponse.query.filter_by(project_id=project_id, week_date=week_date).all()
-    total_defs = TaskDefinition.query.count()
-    answered = [r for r in responses if r.status in ('نعم', 'لا ينطبق')]
-    proj = Project.query.get(project_id)
-    if len(answered) == total_defs:
-        proj.status = 'مكتمل ومغلق'
-    else:
-        has_any = any(r.status for r in responses)
-        proj.status = 'جاري العمل عليه' if has_any else proj.status
-    db.session.commit()
-    return jsonify({'ok': True, 'project_status': proj.status})
+    # Update project status if provided from frontend
+    project_status = data.get('project_status')
+    if project_status:
+        proj = Project.query.get(project_id)
+        if proj:
+            proj.status = project_status
+            db.session.commit()
+    
+    return jsonify({'ok': True, 'message': 'تم الحفظ بنجاح'})
 
 @app.route('/api/projects_by_employee/<int:emp_id>')
 @login_required
