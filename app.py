@@ -200,6 +200,24 @@ def add_project():
     flash(f'تم إضافة المشروع {name} بنجاح', 'success')
     return redirect(url_for('projects_page'))
 
+# ---- ADMIN ROUTES ----
+@app.route('/admin/projects')
+@login_required
+def admin_projects():
+    """Admin page to manage project statuses"""
+    projects = Project.query.all()
+    return render_template('admin_projects.html', projects=projects)
+
+@app.route('/admin/projects/<int:proj_id>/status', methods=['POST'])
+@login_required
+def admin_update_project_status(proj_id):
+    """Admin update project status"""
+    proj = Project.query.get_or_404(proj_id)
+    proj.status = request.form.get('status', proj.status)
+    db.session.commit()
+    flash(f'تم تحديث حالة المشروع {proj.name} إلى {proj.status}', 'success')
+    return redirect(url_for('admin_projects'))
+
 # ---- WEEKLY TASKS ----
 @app.route('/tasks')
 @login_required

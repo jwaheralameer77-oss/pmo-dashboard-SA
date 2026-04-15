@@ -134,15 +134,18 @@
               <!-- Task Question -->
               <td class="px-4 py-3 text-gray-700 font-medium max-w-xs" x-text="task.question"></td>
 
-              <!-- Status Input (Manual Entry) -->
+              <!-- Status Dropdown (No Auto Update) -->
               <td class="px-4 py-2">
-                <input
-                  type="text"
+                <select
                   x-model="task.status"
-                  placeholder="أدخل الحالة..."
-                  class="w-full border border-gray-200 rounded-lg px-3 py-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                />
-                <div class="text-xs text-gray-400 mt-1">مثال: نعم، لا، جاري العمل</div>
+                  class="w-full rounded-lg px-2 py-1 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                >
+                  <option value="">-- اختر --</option>
+                  <option value="نعم">نعم</option>
+                  <option value="لا">لا</option>
+                  <option value="لا ينطبق">لا ينطبق</option>
+                  <option value="جاري العمل">جاري العمل</option>
+                </select>
               </td>
 
               <!-- Notes Input -->
@@ -175,8 +178,8 @@
       </table>
     </div>
 
-    <!-- Save Button -->
-    <div class="mt-6 flex items-center gap-4">
+    <!-- Save Button Only -->
+    <div class="mt-6">
       <button
         @click="saveTasks()"
         :disabled="tasks.length === 0"
@@ -184,21 +187,6 @@
       >
         حفظ المهام
       </button>
-
-      <!-- Project Status Badge -->
-      <div x-show="projectStatus" x-transition class="flex items-center gap-2">
-        <span class="text-sm text-gray-600 font-medium">حالة المشروع:</span>
-        <span
-          class="inline-block px-4 py-1 rounded-full text-sm font-bold"
-          :class="{
-            'bg-green-100 text-green-800 border border-green-300': projectStatus === 'مكتمل',
-            'bg-orange-100 text-orange-800 border border-orange-300': projectStatus === 'جاري',
-            'bg-red-100 text-red-800 border border-red-300': projectStatus === 'متأخر',
-            'bg-gray-100 text-gray-700 border border-gray-300': !['مكتمل','جاري','متأخر'].includes(projectStatus)
-          }"
-          x-text="projectStatus"
-        ></span>
-      </div>
     </div>
   </div>
 
