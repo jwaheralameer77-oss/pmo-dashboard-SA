@@ -461,12 +461,21 @@ def report_page():
     custom_tasks_list = []
     attendance_records = []
     top_performer = None
+    all_projects = []
+    all_initiatives = []
+    all_custom_tasks = []
     
     # Get attendance data for the month
-    if report_type == 'attendance' or report_type == 'full':
+    if report_type in ['attendance', 'full', 'all']:
         attendance_records = Attendance.query.filter(
             Attendance.date.like(f'{year}-{month:02d}%')
         ).all()
+    
+    # Get all data for comprehensive report
+    if report_type == 'all':
+        all_projects = Project.query.all()
+        all_initiatives = Initiative.query.all()
+        all_custom_tasks = CustomTask.query.all()
     
     # Calculate top performer for the month
     if report_type == 'certificate' or report_type == 'full':
@@ -514,6 +523,8 @@ def report_page():
             projects_list=projects_list, initiatives_list=initiatives_list,
             custom_tasks_list=custom_tasks_list, report_type=report_type,
             attendance_records=attendance_records, top_performer=top_performer,
+            all_projects=all_projects, all_initiatives=all_initiatives,
+            all_custom_tasks=all_custom_tasks,
             month=month, year=year, month_name=months_ar[month-1])
     except Exception:
         import traceback

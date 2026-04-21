@@ -61,6 +61,10 @@
               <input type="radio" name="type" value="certificate" {% if report_type == 'certificate' %}checked{% endif %} onchange="document.getElementById('reportForm').submit()">
               <span class="text-sm font-medium">🏆 شهادة تميز</span>
             </label>
+            <label class="flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer {% if report_type == 'all' %}bg-red-100 border-red-500{% else %}bg-gray-50{% endif %}">
+              <input type="radio" name="type" value="all" {% if report_type == 'all' %}checked{% endif %} onchange="document.getElementById('reportForm').submit()">
+              <span class="text-sm font-medium">📋 تقرير شامل للجميع</span>
+            </label>
           </div>
         </div>
       </div>
@@ -91,7 +95,13 @@
     {% if selected %}
     <div class="flex gap-3 pt-4 border-t">
       <button onclick="window.print()" class="flex items-center gap-2 px-6 py-2 rounded-lg text-white font-bold" style="background-color: #0D7377;">
-        <span>&#x1F5B6;</span> طباعة التقرير
+        طباعة التقرير
+      </button>
+    </div>
+    {% elif report_type == 'all' %}
+    <div class="flex gap-3 pt-4 border-t">
+      <button onclick="window.print()" class="flex items-center gap-2 px-6 py-2 rounded-lg text-white font-bold" style="background-color: #0D7377;">
+        طباعة التقرير الشامل
       </button>
     </div>
     {% endif %}
@@ -434,11 +444,179 @@
 
   </div>
 
+  {% elif report_type == 'all' %}
+  <!-- Comprehensive Report for All Employees -->
+  <div class="print-area bg-white rounded-2xl shadow-lg p-8 max-w-5xl mx-auto">
+    
+    <!-- Logo & Header -->
+    <div class="text-center mb-6">
+      <img src="/static/img/logo.jpeg" alt="شعار المركز" class="h-28 object-contain mx-auto mb-4" onerror="this.style.display='none'" />
+      <h1 class="text-2xl font-bold text-gray-800">مركز التأمين الصحي الوطني</h1>
+      <h2 class="text-lg font-semibold mt-1" style="color: #0D7377;">التقرير الشامل لجميع الأعمال</h2>
+      <p class="text-sm text-gray-500 mt-2" id="allReportDate"></p>
+    </div>
+    <hr class="border-gray-300 mb-6" />
+
+    <!-- 1. All Projects -->
+    <div class="mb-8">
+      <h3 class="text-xl font-bold mb-4 pb-2 border-b-2" style="color: #0D7377; border-color: #0D7377;">
+        المشاريع ({{ all_projects|length }})
+      </h3>
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr style="background-color: #0D7377;">
+            <th class="px-3 py-2 text-white text-center w-10">#</th>
+            <th class="px-3 py-2 text-white text-right">اسم المشروع</th>
+            <th class="px-3 py-2 text-white text-right">المسؤول</th>
+            <th class="px-3 py-2 text-white text-right">المحفظة</th>
+            <th class="px-3 py-2 text-white text-center w-32">الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for project in all_projects %}
+          <tr class="{% if loop.index is odd %}bg-white{% else %}bg-gray-50{% endif %}">
+            <td class="px-3 py-2 border text-center">{{ loop.index }}</td>
+            <td class="px-3 py-2 border font-medium">{{ project.name }}</td>
+            <td class="px-3 py-2 border">{{ project.employee.name if project.employee else '-' }}</td>
+            <td class="px-3 py-2 border">{{ project.portfolio.name if project.portfolio else '-' }}</td>
+            <td class="px-3 py-2 border text-center">
+              <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold
+                {% if 'مكتمل' in project.status %}bg-green-100 text-green-700
+                {% elif 'جاري' in project.status %}bg-orange-100 text-orange-700
+                {% elif 'متوقف' in project.status %}bg-red-100 text-red-700
+                {% else %}bg-gray-100 text-gray-700{% endif %}">{{ project.status }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2. All Initiatives -->
+    <div class="mb-8">
+      <h3 class="text-xl font-bold mb-4 pb-2 border-b-2" style="color: #7B1FA2; border-color: #7B1FA2;">
+        المبادرات والإنجازات ({{ all_initiatives|length }})
+      </h3>
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr style="background-color: #7B1FA2;">
+            <th class="px-3 py-2 text-white text-center w-10">#</th>
+            <th class="px-3 py-2 text-white text-right">اسم المبادرة</th>
+            <th class="px-3 py-2 text-white text-right">المسؤول</th>
+            <th class="px-3 py-2 text-white text-center">البداية</th>
+            <th class="px-3 py-2 text-white text-center">النهاية</th>
+            <th class="px-3 py-2 text-white text-center w-24">الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for init in all_initiatives %}
+          <tr class="{% if loop.index is odd %}bg-white{% else %}bg-gray-50{% endif %}">
+            <td class="px-3 py-2 border text-center">{{ loop.index }}</td>
+            <td class="px-3 py-2 border font-medium">{{ init.name }}</td>
+            <td class="px-3 py-2 border">{{ init.employee.name if init.employee else '-' }}</td>
+            <td class="px-3 py-2 border text-center">{{ init.start_date or '-' }}</td>
+            <td class="px-3 py-2 border text-center">{{ init.end_date or '-' }}</td>
+            <td class="px-3 py-2 border text-center">
+              <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold
+                {% if init.status in ['مكتملة', 'منجزة'] %}bg-green-100 text-green-700
+                {% else %}bg-orange-100 text-orange-700{% endif %}">{{ init.status }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. All Custom Tasks -->
+    <div class="mb-8">
+      <h3 class="text-xl font-bold mb-4 pb-2 border-b-2" style="color: #1565C0; border-color: #1565C0;">
+        المهام الإضافية ({{ all_custom_tasks|length }})
+      </h3>
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr style="background-color: #1565C0;">
+            <th class="px-3 py-2 text-white text-center w-10">#</th>
+            <th class="px-3 py-2 text-white text-right">عنوان المهمة</th>
+            <th class="px-3 py-2 text-white text-right">المسؤول</th>
+            <th class="px-3 py-2 text-white text-center">البداية</th>
+            <th class="px-3 py-2 text-white text-center">النهاية</th>
+            <th class="px-3 py-2 text-white text-center w-24">الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in all_custom_tasks %}
+          <tr class="{% if loop.index is odd %}bg-white{% else %}bg-gray-50{% endif %}">
+            <td class="px-3 py-2 border text-center">{{ loop.index }}</td>
+            <td class="px-3 py-2 border font-medium">{{ task.title }}</td>
+            <td class="px-3 py-2 border">{{ task.employee.name if task.employee else '-' }}</td>
+            <td class="px-3 py-2 border text-center">{{ task.start_date or '-' }}</td>
+            <td class="px-3 py-2 border text-center">{{ task.end_date or '-' }}</td>
+            <td class="px-3 py-2 border text-center">
+              <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold
+                {% if task.status == 'مكتملة' %}bg-green-100 text-green-700
+                {% else %}bg-orange-100 text-orange-700{% endif %}">{{ task.status }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Attendance Summary -->
+    <div class="mb-8">
+      <h3 class="text-xl font-bold mb-4 pb-2 border-b-2" style="color: #FB8C00; border-color: #FB8C00;">
+        الحضور والانصراف - {{ month_name }} {{ year }}
+      </h3>
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr style="background-color: #FB8C00;">
+            <th class="px-3 py-3 text-white text-right">الموظف</th>
+            <th class="px-3 py-3 text-white text-center">حاضر</th>
+            <th class="px-3 py-3 text-white text-center">سنوية</th>
+            <th class="px-3 py-3 text-white text-center">مرضية</th>
+            <th class="px-3 py-3 text-white text-center">عن بعد</th>
+            <th class="px-3 py-3 text-white text-center">أخرى</th>
+            <th class="px-3 py-3 text-white text-center">نسبة الحضور</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for emp in employees %}
+          {% set emp_att = attendance_records | selectattr('employee_id', 'equalto', emp.id) | list %}
+          {% set present = emp_att | selectattr('status', 'equalto', 'present') | list | length %}
+          {% set annual = emp_att | selectattr('status', 'equalto', 'annual') | list | length %}
+          {% set sick = emp_att | selectattr('status', 'equalto', 'sick') | list | length %}
+          {% set remote = emp_att | selectattr('status', 'equalto', 'remote') | list | length %}
+          {% set other = emp_att | selectattr('status', 'equalto', 'other') | list | length %}
+          {% set total = emp_att | length %}
+          {% set rate = (present / total * 100) if total > 0 else 0 %}
+          <tr class="{% if loop.index is odd %}bg-white{% else %}bg-gray-50{% endif %}">
+            <td class="px-3 py-3 border font-medium">{{ emp.name }}</td>
+            <td class="px-3 py-3 border text-center text-green-600 font-bold">{{ present }}</td>
+            <td class="px-3 py-3 border text-center text-green-800">{{ annual }}</td>
+            <td class="px-3 py-3 border text-center text-orange-600">{{ sick }}</td>
+            <td class="px-3 py-3 border text-center text-blue-600">{{ remote }}</td>
+            <td class="px-3 py-3 border text-center text-purple-600">{{ other }}</td>
+            <td class="px-3 py-3 border text-center">
+              <span class="font-bold {% if rate >= 90 %}text-green-600{% elif rate >= 75 %}text-orange-600{% else %}text-red-600{% endif %}">{{ rate|round }}%</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-8 pt-4 border-t border-gray-300">
+      <p class="text-gray-400 italic text-sm">مركز التأمين الصحي الوطني - إدارة المشاريع (PMO)</p>
+    </div>
+  </div>
+
   {% else %}
   <div class="text-center py-20 text-gray-400 text-lg no-print bg-white rounded-xl shadow-md">
     <div class="text-6xl mb-4">📊</div>
     <p>الرجاء اختيار نوع التقرير</p>
     <p class="text-sm mt-2">لتقرير الحضور أو شهادة التميز، لا يحتاج اختيار موظف</p>
+    <p class="text-sm mt-1">للتقرير الشامل، اضغط "تقرير شامل للجميع"</p>
   </div>
   {% endif %}
 
@@ -448,6 +626,9 @@
 document.getElementById('reportDate').textContent = new Date().toLocaleDateString('ar-SA');
 if(document.getElementById('certDate')) {
   document.getElementById('certDate').textContent = new Date().toLocaleDateString('ar-SA');
+}
+if(document.getElementById('allReportDate')) {
+  document.getElementById('allReportDate').textContent = new Date().toLocaleDateString('ar-SA');
 }
 </script>
 {% endblock %}
