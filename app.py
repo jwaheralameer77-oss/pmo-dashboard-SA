@@ -532,6 +532,45 @@ def report_page():
         app.logger.error(tb)
         return f"<pre>{tb}</pre>", 500
 
+# ---- DASHBOARD LIVE API ----
+@app.route('/api/dashboard-stats')
+@login_required
+def dashboard_stats():
+    """Return live dashboard statistics as JSON"""
+    employees = Employee.query.filter_by(is_active=True).all()
+    total_projects = Project.query.count()
+    total_portfolios = Portfolio.query.count()
+    total_initiatives = Initiative.query.count()
+    completed_projects = Project.query.filter_by(status='مكتمل ومغلق').count()
+    in_progress_projects = Project.query.filter_by(status='جاري العمل عليه').count()
+    completion_rate = round((completed_projects / total_projects * 100) if total_projects else 0)
+    completed_init = Initiative.query.filter_by(status='مكتملة').count()
+    in_progress_init = Initiative.query.filter_by(status='جاري العمل').count()
+
+    emp_data = []
+    for emp in employees:
+        proj_count = emp.projects.count()
+        completed = emp.projects.filter_by(status='مكتمل ومغلق').count()
+        emp_data.append({
+            'id': emp.id,
+            'name': emp.name,
+            'project_count': proj_count,
+            'completed': completed,
+            'rate': round((completed / proj_count * 100) if proj_count else 0)
+        })
+
+    return jsonify({
+        'total_employees': len(employees),
+        'total_projects': total_projects,
+        'total_portfolios': total_portfolios,
+        'total_initiatives': total_initiatives,
+        'completion_rate': completion_rate,
+        'completed_init': completed_init,
+        'in_progress_init': in_progress_init,
+        'employees': emp_data,
+        'timestamp': datetime.datetime.now().strftime('%H:%M:%S')
+    })
+
 # ---- PERFORMANCE RATING ----
 @app.route('/performance')
 @login_required
