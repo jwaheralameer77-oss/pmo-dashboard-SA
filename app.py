@@ -110,7 +110,7 @@ def dashboard():
     status_values = [completed_projects, in_progress_projects, stopped_projects]
 
     return render_template('dashboard.html',
-        employees=emp_data, total_employees=len(employees),
+        employees_raw=emp_data, total_employees=len(employees),
         total_projects=total_projects, total_portfolios=total_portfolios,
         total_initiatives=total_initiatives,
         completion_rate=completion_rate, ratings=PERFORMANCE_RATING,
