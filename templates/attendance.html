@@ -3,15 +3,32 @@
 {% block title %}الحضور والانصراف{% endblock %}
 
 {% block content %}
-<div class="p-6" dir="rtl">
+<div class="p-6" dir="rtl"
+  x-data="{
+    refreshInterval: null,
+    lastUpdated: new Date().toLocaleString('ar-SA'),
+    startAutoRefresh() {
+      this.refreshInterval = setInterval(() => {
+        location.reload();
+      }, 300000); // Refresh every 5 minutes
+    },
+    init() {
+      this.startAutoRefresh();
+    }
+  }"
+>
 
   <!-- Header -->
   <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold text-gray-800 border-b-4 pb-3 inline-block" style="border-color: #1565C0;">
-        &#x1F4C5; سجل الحضور والانصراف
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        سجل الحضور والانصراف
       </h1>
       <p class="text-gray-500 mt-2">تتبع حضور الموظفين والإجازات</p>
+      <p class="text-xs text-gray-400 mt-1" x-text="'آخر تحديث: ' + lastUpdated"></p>
     </div>
     <div class="bg-white rounded-xl shadow-md p-4">
       <form method="GET" action="/attendance" class="flex flex-wrap items-end gap-3">
@@ -43,7 +60,11 @@
           <p class="text-gray-500 text-sm">إجمالي أيام العمل</p>
           <p class="text-3xl font-bold text-blue-600">{{ days|length }}</p>
         </div>
-        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">&#x1F4C5;</div>
+        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -55,7 +76,11 @@
           {% set avg_rate = (total_rate / employees|length)|round if employees else 0 %}
           <p class="text-3xl font-bold text-green-600">{{ avg_rate }}%</p>
         </div>
-        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-2xl">&#x2705;</div>
+        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -63,9 +88,14 @@
       <div class="flex items-center justify-between">
         <div>
           <p class="text-gray-500 text-sm">إجازات سنوية مستخدمة</p>
-          <p class="text-3xl font-bold text-orange-600">—</p>
+          {% set annual_used = records.values()|select('equalto', 'annual')|list|length %}
+          <p class="text-3xl font-bold text-orange-600">{{ annual_used }}</p>
         </div>
-        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-2xl">&#x1F334;</div>
+        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -73,9 +103,14 @@
       <div class="flex items-center justify-between">
         <div>
           <p class="text-gray-500 text-sm">إجازات مرضية مستخدمة</p>
-          <p class="text-3xl font-bold text-red-600">—</p>
+          {% set sick_used = records.values()|select('equalto', 'sick')|list|length %}
+          <p class="text-3xl font-bold text-red-600">{{ sick_used }}</p>
         </div>
-        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-2xl">&#x1F912;</div>
+        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
       </div>
     </div>
   </div>
@@ -127,26 +162,36 @@
 
   <!-- Legend -->
   <div class="bg-white rounded-xl shadow-md p-5 mb-6">
-    <h3 class="text-sm font-semibold text-gray-500 mb-3">دليل الرموز (انقر على الخلية للتبديل بين الحالات)</h3>
+    <h3 class="text-sm font-semibold text-gray-500 mb-3">دليل الأيقونات (انقر على الخلية للتبديل بين الحالات)</h3>
     <div class="flex flex-wrap gap-3">
       <div class="flex items-center gap-2 bg-green-100 border-2 border-green-400 rounded-lg px-3 py-2">
-        <span class="text-2xl">&#x2705;</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
         <span class="text-green-800 font-bold">حاضر</span>
       </div>
       <div class="flex items-center gap-2 bg-green-200 border-2 border-green-500 rounded-lg px-3 py-2">
-        <span class="text-2xl">&#x1F334;</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
         <span class="text-green-900 font-bold">إجازة سنوية</span>
       </div>
       <div class="flex items-center gap-2 bg-orange-100 border-2 border-orange-400 rounded-lg px-3 py-2">
-        <span class="text-2xl">&#x1F912;</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
         <span class="text-orange-800 font-bold">إجازة مرضية</span>
       </div>
       <div class="flex items-center gap-2 bg-blue-100 border-2 border-blue-400 rounded-lg px-3 py-2">
-        <span class="text-2xl">&#x1F3E0;</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
         <span class="text-blue-800 font-bold">عمل عن بعد</span>
       </div>
       <div class="flex items-center gap-2 bg-purple-100 border-2 border-purple-400 rounded-lg px-3 py-2">
-        <span class="text-2xl">&#x23F1;&#xFE0F;</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
         <span class="text-purple-800 font-bold">إجازة أخرى</span>
       </div>
     </div>
@@ -154,33 +199,46 @@
 
   <!-- Calendar Grid -->
   <div class="bg-white rounded-xl shadow-md overflow-hidden">
-    <div class="px-6 py-4 border-b" style="background-color: #0A5C5F;">
+    <div class="px-6 py-4 border-b flex justify-between items-center" style="background-color: #0A5C5F;">
       <h3 class="text-lg font-bold text-white">جدول الحضور — {{ month_name }} {{ year }}</h3>
+      <div class="flex items-center gap-2 text-white/80 text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-data="{ spinning: false }" x-init="setInterval(() => spinning = !spinning, 5000)">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>يتم التحديث تلقائياً</span>
+      </div>
     </div>
-    <div class="overflow-x-auto p-4">
-      <table class="border-collapse"
-        x-data="{
-          statuses: ['', 'present', 'annual', 'sick', 'remote', 'other'],
-          icons: { 'present': '\u2705', 'sick': '\uD83E\uDD12', 'annual': '\uD83C\uDF34', 'remote': '\uD83C\uDFE0', 'other': '\u23F1\uFE0F', '': '' },
-          async toggle(empId, date, el) {
-            let cur = el.dataset.status || '';
-            let idx = (this.statuses.indexOf(cur) + 1) % this.statuses.length;
-            let next = this.statuses[idx];
-            let r = await fetch('/api/attendance', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ employee_id: empId, date: date, status: next })
-            });
-            if (r.ok) {
-              el.dataset.status = next;
-              el.innerHTML = this.icons[next] || '';
-              el.className = el.className.replace(/bg-\w+-\d+/g, '').replace(/text-\w+-\d+/g, '').replace(/border-\w+-\d+/g, '').trim();
-              let colorMap = { 'present': 'bg-green-100 text-green-700 border-green-400', 'sick': 'bg-orange-100 text-orange-700 border-orange-400', 'annual': 'bg-green-200 text-green-800 border-green-500', 'remote': 'bg-blue-100 text-blue-700 border-blue-400', 'other': 'bg-purple-100 text-purple-700 border-purple-400', '': 'bg-gray-50 text-gray-300 border-gray-300' };
-              el.className += ' ' + (colorMap[next] || 'bg-gray-50 border-gray-300');
-            }
+    <div class="overflow-x-auto p-4"
+      x-data="{
+        statuses: ['', 'present', 'annual', 'sick', 'remote', 'other'],
+        icons: {
+          'present': '<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 mx-auto\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M5 13l4 4L19 7\'/></svg>',
+          'sick': '<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 mx-auto\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\'/></svg>',
+          'annual': '<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 mx-auto\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\'/></svg>',
+          'remote': '<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 mx-auto\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6\'/></svg>',
+          'other': '<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 mx-auto\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\'/></svg>',
+          '': ''
+        },
+        async toggle(empId, date, el) {
+          let cur = el.dataset.status || '';
+          let idx = (this.statuses.indexOf(cur) + 1) % this.statuses.length;
+          let next = this.statuses[idx];
+          let r = await fetch('/api/attendance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ employee_id: empId, date: date, status: next })
+          });
+          if (r.ok) {
+            el.dataset.status = next;
+            el.innerHTML = this.icons[next] || '';
+            el.className = el.className.replace(/bg-\w+-\d+/g, '').replace(/text-\w+-\d+/g, '').replace(/border-\w+-\d+/g, '').trim();
+            let colorMap = { 'present': 'bg-green-100 text-green-700 border-green-400', 'sick': 'bg-orange-100 text-orange-700 border-orange-400', 'annual': 'bg-green-200 text-green-800 border-green-500', 'remote': 'bg-blue-100 text-blue-700 border-blue-400', 'other': 'bg-purple-100 text-purple-700 border-purple-400', '': 'bg-gray-50 text-gray-300 border-gray-300' };
+            el.className += ' ' + (colorMap[next] || 'bg-gray-50 border-gray-300');
           }
-        }"
-      >
+        }
+      }"
+    >
+      <table class="border-collapse">
         <thead>
           <tr style="background-color: #E0F2F1;">
             <th class="px-4 py-3 text-right font-semibold text-gray-700 sticky right-0 z-10" style="background-color: #E0F2F1;">الموظف</th>
@@ -199,16 +257,24 @@
             {% for day in days %}
             {% set status_key = (emp.id, day.date) %}
             {% set cur_status = records.get(status_key, '') %}
-            {% set icon_map = {'present': '&#x2705;', 'sick': '&#x1F912;', 'annual': '&#x1F334;', 'remote': '&#x1F3E0;', 'other': '&#x23F1;&#xFE0F;', '': ''} %}
+            {% set icon_svg_map = {
+              'present': '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',
+              'sick': '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>',
+              'annual': '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+              'remote': '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>',
+              'other': '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+              '': ''
+            } %}
+            {% set icon_text = {'present': 'P', 'sick': 'S', 'annual': 'A', 'remote': 'R', 'other': 'O', '': ''} %}
             {% set color_map = {'present': 'bg-green-100 text-green-700 border-green-400', 'sick': 'bg-orange-100 text-orange-700 border-orange-400', 'annual': 'bg-green-200 text-green-800 border-green-500', 'remote': 'bg-blue-100 text-blue-700 border-blue-400', 'other': 'bg-purple-100 text-purple-700 border-purple-400', '': 'bg-gray-50 text-gray-300 border-gray-300'} %}
             <td class="p-1 text-center">
               <button
                 type="button"
                 data-status="{{ cur_status }}"
                 @click="toggle({{ emp.id }}, '{{ day.date }}', $el)"
-                class="w-12 h-12 rounded-xl text-2xl border-2 font-bold transition hover:scale-110 hover:shadow-lg cursor-pointer {{ color_map.get(cur_status, 'bg-gray-50 text-gray-300 border-gray-300') }}"
+                class="w-10 h-10 rounded-lg border-2 font-bold transition hover:scale-110 hover:shadow-lg cursor-pointer flex items-center justify-center {{ color_map.get(cur_status, 'bg-gray-50 text-gray-300 border-gray-300') }}"
                 title="{{ day.date }}"
-              >{{ icon_map.get(cur_status, '') }}</button>
+              >{{ icon_text.get(cur_status, '') }}</button>
             </td>
             {% endfor %}
           </tr>
