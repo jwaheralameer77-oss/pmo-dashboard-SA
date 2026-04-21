@@ -200,6 +200,28 @@ def add_project():
     flash(f'تم إضافة المشروع {name} بنجاح', 'success')
     return redirect(url_for('projects_page'))
 
+@app.route('/projects/<int:proj_id>/edit', methods=['POST'])
+@login_required
+def edit_project(proj_id):
+    proj = Project.query.get_or_404(proj_id)
+    proj.name = request.form.get('name', proj.name).strip()
+    emp_id = request.form.get('employee_id')
+    if emp_id:
+        proj.employee_id = int(emp_id)
+    db.session.commit()
+    flash(f'تم تعديل المشروع {proj.name} بنجاح', 'success')
+    return redirect(url_for('projects_page'))
+
+@app.route('/projects/<int:proj_id>/delete', methods=['POST'])
+@login_required
+def delete_project(proj_id):
+    proj = Project.query.get_or_404(proj_id)
+    name = proj.name
+    db.session.delete(proj)
+    db.session.commit()
+    flash(f'تم حذف المشروع {name}', 'success')
+    return redirect(url_for('projects_page'))
+
 # ---- ADMIN ROUTES ----
 @app.route('/admin/projects')
 @login_required
@@ -327,7 +349,7 @@ def add_custom_task():
         title=request.form['title'].strip(),
         description=request.form.get('description', '').strip(),
         start_date=request.form['start_date'],
-        end_date=request_form['end_date'],
+        end_date=request.form['end_date'],
         status=request.form.get('status', 'جاري العمل')
     )
     db.session.add(task)

@@ -105,6 +105,7 @@
             <th class="px-4 py-3 text-right font-semibold">المحفظة</th>
             <th class="px-4 py-3 text-right font-semibold">المسؤول</th>
             <th class="px-4 py-3 text-center font-semibold">الحالة</th>
+            <th class="px-4 py-3 text-center font-semibold">إجراءات</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -159,10 +160,25 @@
               </select>
             </td>
 
+            <!-- Actions -->
+            <td class="px-4 py-3 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="openEditModal({{ project.id }}, '{{ project.name }}', '{{ project.employee_id or '' }}', '{{ project.portfolio_id or '' }}')" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                  تعديل
+                </button>
+                <form method="POST" action="/projects/{{ project.id }}/delete" onsubmit="return confirm('هل أنت متأكد من حذف هذا المشروع؟')">
+                  <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                    حذف
+                  </button>
+                </form>
+              </div>
+            </td>
+
           </tr>
           {% else %}
           <tr>
-            <td colspan="5" class="px-4 py-10 text-center text-gray-400">
+            <td colspan="6" class="px-4 py-10 text-center text-gray-400">
               <div class="flex flex-col items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -254,4 +270,57 @@
     </form>
   </div>
 </div>
+
+<!-- Edit Project Modal -->
+<div id="editProjectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">تعديل المشروع</h3>
+      <button onclick="document.getElementById('editProjectModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <form method="POST" id="editProjectForm" action="">
+      <input type="hidden" name="project_id" id="edit_project_id">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">اسم المشروع *</label>
+        <input type="text" name="name" id="edit_project_name" required
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="اسم المشروع">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">المسؤول</label>
+        <select name="employee_id" id="edit_project_employee"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">-- اختر المسؤول --</option>
+          {% for employee in employees %}
+          <option value="{{ employee.id }}">{{ employee.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
+          حفظ التعديلات
+        </button>
+        <button type="button" onclick="document.getElementById('editProjectModal').classList.add('hidden')"
+          class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 rounded-lg transition">
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditModal(id, name, empId, portId) {
+  document.getElementById('edit_project_id').value = id;
+  document.getElementById('edit_project_name').value = name;
+  document.getElementById('edit_project_employee').value = empId;
+  document.getElementById('editProjectForm').action = '/projects/' + id + '/edit';
+  document.getElementById('editProjectModal').classList.remove('hidden');
+}
+</script>
 {% endblock %}

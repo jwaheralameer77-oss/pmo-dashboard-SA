@@ -158,9 +158,15 @@
               </select>
             </td>
             <td class="px-4 py-3 text-center">
-              <form method="POST" action="/initiatives/{{ init.id }}/delete" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه المبادرة؟')">
-                <button type="submit" class="text-red-600 hover:text-red-800 text-xs">حذف</button>
-              </form>
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="alert('لتعديل المبادرة، احذفها وأعد إضافتها بالبيانات الجديدة')" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                  تعديل
+                </button>
+                <form method="POST" action="/initiatives/{{ init.id }}/delete" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه المبادرة؟')">
+                  <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">حذف</button>
+                </form>
+              </div>
             </td>
           </tr>
           {% else %}
@@ -212,9 +218,15 @@
               </select>
             </td>
             <td class="px-4 py-3 text-center">
-              <form method="POST" action="/custom_tasks/{{ task.id }}/delete" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه المهمة؟')">
-                <button type="submit" class="text-red-600 hover:text-red-800 text-xs">حذف</button>
-              </form>
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="alert('لتعديل المهمة، احذفها وأعد إضافتها بالبيانات الجديدة')" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                  تعديل
+                </button>
+                <form method="POST" action="/custom_tasks/{{ task.id }}/delete" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه المهمة؟')">
+                  <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">حذف</button>
+                </form>
+              </div>
             </td>
           </tr>
           {% else %}
